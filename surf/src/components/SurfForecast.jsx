@@ -321,7 +321,6 @@ const SurfForecast = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>TODAY&apos;S SURF</h1>
       <hr className={styles.section} />
       <p className={styles.intro}>Surf forecast summary for San Diego spots.</p>
 
