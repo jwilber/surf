@@ -278,17 +278,19 @@ const SurfForecast = () => {
   };
 
   useEffect(() => {
-    fetch('/today.csv')
-      .then((res) => res.text())
-      .then((csv) => {
-        const data = parseCSV(csv);
-        setSurfData(data);
-        setLoading(false);
+    const csvUrl = '/surf/today.csv';
+    console.log('csvUrl', csvUrl);
+    fetch(csvUrl, { cache: 'no-store' })
+      .then(res => {
+        if (!res.ok) throw new Error(`CSV ${res.status}`);
+        return res.text();
       })
-      .catch(() => {
-        setError('Failed to load surf data');
-        setLoading(false);
-      });
+      .then(csv => {
+        const data = parseCSV(csv) || [];
+        setSurfData(Array.isArray(data) ? data : []);
+      })
+      .catch(err => setError(String(err)))
+      .finally(() => setLoading(false));
   }, []);
 
   const groupedBySpot = surfData.reduce((acc, curr) => {
