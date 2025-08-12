@@ -1,0 +1,162 @@
+/* SurfForecast.module.css - Minimal Apple-inspired Design with global theme vars */
+
+/* Container uses theme vars */
+.container {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-text);
+  margin: 0.25rem 0 0 0;
+}
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  font-size: 0.875rem;
+  color: var(--muted-text);
+}
+
+.error {
+  color: #ff3b30; /* keep semantic red */
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 900px;
+}
+
+.table {
+  table-layout: auto;
+}
+
+.chartHeader {
+  width: 160px;
+  text-align: center;
+}
+
+.table thead {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.table th:first-child {
+  padding-left: 0;
+}
+
+.table th:last-child {
+  padding-right: 0;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--row-border-color);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 1rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.table td:first-child {
+  padding-left: 0;
+}
+
+.table td:last-child {
+  padding-right: 0;
+}
+
+.spot {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.rating {
+  white-space: nowrap;
+}
+
+.ratingDots {
+  font-size: 0.75rem;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
+
+.data {
+  color: var(--secondary-text);
+  font-size: 0.875rem;
+}
+
+.chart {
+  padding: 0.5rem 0;
+}
+
+.chart svg {
+  display: block;
+}
+
+/* Theme toggle button (works with global body class) */
+.themeToggle {
+  position: fixed; /* keep it on the page corner */
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  z-index: 1000;
+}
+
+.themeToggle:hover {
+  background-color: var(--hover-bg);
+}
+
+.themeToggle svg {
+  stroke: currentColor;
+}

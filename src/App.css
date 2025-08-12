@@ -1,0 +1,51 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.App {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile scaling adjustments */
+@media (max-width: 768px) {
+  .App {
+    padding: 0;
+    font-size: 0.9rem;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+  }
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+  .App {
+    font-size: 0.8rem;
+  }
+
+  table {
+    min-width: 100%;
+  }
+
+  th,
+  td {
+    padding: 0.4rem;
+  }
+}
