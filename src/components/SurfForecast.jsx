@@ -330,7 +330,7 @@ const SurfForecast = () => {
 
   // Load data
   useEffect(() => {
-    fetch('/surf/today.csv')
+    fetch('/today.csv')
       .then(res => res.text())
       .then(csv => {
         const data = parseCSV(csv);
@@ -402,8 +402,8 @@ const SurfForecast = () => {
               <th>Tide</th>
               <th>Wind</th>
               <th>Temp</th>
-              <th className={styles.chartHeader}>Wave Trend</th>
-              <th className={styles.chartHeader}>Tide Trend</th>
+              <th className={styles.chartHeader}>Wave</th>
+              <th className={styles.chartHeader}>Tide</th>
             </tr>
           </thead>
           <tbody>

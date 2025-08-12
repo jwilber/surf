@@ -59,3 +59,7 @@
 .App {
   width: 100%;
 }
+
+* {
+  font-family: "monospace", sans-serif;
+}
