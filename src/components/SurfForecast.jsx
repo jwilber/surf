@@ -8,9 +8,9 @@ import { Sun, Moon } from 'lucide-react';
 const RATING_COLORS = {
   POOR: '#D14D41',
   POOR_TO_FAIR: '#DA702C',
-  FAIR: '#D0A215',
-  FAIR_TO_GOOD: '#879A39',
-  GOOD: '#3AA99F',
+  FAIR: '#3AA99F',
+  FAIR_TO_GOOD: '#3AA99F',
+  GOOD: '#CE5D97',
   GREAT: '#CE5D97',
 };
 
