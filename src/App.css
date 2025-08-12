@@ -49,3 +49,13 @@
     padding: 0.4rem;
   }
 }
+
+.scaleWrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden; /* prevents horizontal scroll when scaled */
+}
+
+.App {
+  width: 100%;
+}
