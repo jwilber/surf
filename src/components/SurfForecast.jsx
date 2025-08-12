@@ -330,7 +330,7 @@ const SurfForecast = () => {
 
   // Load data
   useEffect(() => {
-    fetch('/today.csv')
+    fetch('/surf/today.csv')
       .then(res => res.text())
       .then(csv => {
         const data = parseCSV(csv);

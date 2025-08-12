@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --outDir docs --base /surf/ --open /surf/",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postbuild": "touch docs/.nojekyll"
   },
   "dependencies": {
     "d3": "^7.9.0",
