@@ -45,7 +45,7 @@ const ratingToLabel = (key) => {
 
 // --------------------------
 
-const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, width = 156, height = 50 }) => {
+const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, isMobile, width = 156, height = 50 }) => {
   const svgRef = useRef(null);
 
   useEffect(() => {
@@ -54,15 +54,20 @@ const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, width = 156,
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
-    // Get current hour
+    // Get current hour to find closest data point
     const currentHour = new Date().getHours();
     let currentIndex = -1;
+    let minDiff = Infinity;
+    
     data.forEach((d, i) => {
       const hour = parseInt(d.timestamp.replace(/[^0-9]/g, ''));
-      if (hour <= currentHour + 12 || currentIndex === -1) {
+      const diff = Math.abs(hour - currentHour);
+      if (diff < minDiff) {
+        minDiff = diff;
         currentIndex = i;
       }
     });
+    
     if (currentIndex === -1) currentIndex = 0;
 
     const margin = { top: 10, right: 5, bottom: 15, left: 5 };
@@ -127,9 +132,14 @@ const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, width = 156,
       .attr('fill', d => ratingToColor(d.ratingKey))
       .attr('stroke', d => {
         if (hoveredTime && d.time === hoveredTime) return '#000';
+        if (hoveredTime) return 'none'; // Hide all other strokes when hovering
         return d.isCurrent ? '#000' : 'none';
       })
-      .attr('stroke-width', d => (hoveredTime && d.time === hoveredTime) || d.isCurrent ? 1.5 : 0)
+      .attr('stroke-width', d => {
+        if (hoveredTime && d.time === hoveredTime) return 1.5;
+        if (hoveredTime) return 0; // Hide all other strokes when hovering
+        return d.isCurrent ? 1.5 : 0;
+      })
       .attr('rx', 1)
       .style('pointer-events', 'none');
 
@@ -141,18 +151,36 @@ const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, width = 156,
       .attr('x', d => xScale(d.time) + xScale.bandwidth() / 2)
       .attr('y', d => yScale(d.height) - 2)
       .attr('text-anchor', 'middle')
-      .style('font-size', d => d.isCurrent ? '8px' : '7px')
+      .style('font-size', d => {
+        if (isMobile) return '6px';
+        if (hoveredTime && d.time === hoveredTime) return '9px';
+        if (hoveredTime) return '8px';
+        return d.isCurrent ? '9px' : '8px';
+      })
       .style('font-family', '-apple-system, BlinkMacSystemFont, sans-serif')
-      .style('fill', d => ratingToColor(d.ratingKey))
-      .style('font-weight', d => d.isCurrent ? '700' : '500')
+      .style('fill', '#000')
+      .style('font-weight', d => {
+        if (hoveredTime && d.time === hoveredTime) return '700';
+        if (hoveredTime) return '500';
+        return d.isCurrent ? '700' : '500';
+      })
       .style('opacity', d => {
+        if (isMobile) {
+          // On mobile, only show current value
+          return d.isCurrent ? 1 : 0;
+        }
         if (hoveredTime) {
           return d.time === hoveredTime ? 1 : 0;
         }
         return (d.isFirst || d.isLast || d.isCurrent) ? 1 : 0;
       })
       .style('pointer-events', 'none')
-      .text(d => d.height.toFixed(1));
+      .text(d => {
+        if (isMobile && d.isCurrent) {
+          return `${Math.round(d.height)}ft`;
+        }
+        return d.height.toFixed(1);
+      });
 
     // Add x-axis line
     g.append('line')
@@ -163,9 +191,9 @@ const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, width = 156,
       .attr('stroke', '#d2d2d7')
       .attr('stroke-width', 0.5);
 
-    // Add x-axis labels for first, last, and current only
+    // Add x-axis labels - show hovered, or default (first, last, current)
     g.selectAll('.x-label')
-      .data(processedData.filter(d => d.isFirst || d.isLast || d.isCurrent))
+      .data(processedData)
       .enter()
       .append('text')
       .attr('x', d => xScale(d.time) + xScale.bandwidth() / 2)
@@ -174,14 +202,24 @@ const WaveHistogram = ({ data, globalWaveMax, hoveredTime, onHover, width = 156,
       .style('font-size', '6px')
       .style('font-family', '-apple-system, BlinkMacSystemFont, sans-serif')
       .style('fill', '#86868b')
+      .style('opacity', d => {
+        if (isMobile) {
+          // On mobile, only show current time label
+          return d.isCurrent ? 1 : 0;
+        }
+        if (hoveredTime) {
+          return d.time === hoveredTime ? 1 : 0;
+        }
+        return (d.isFirst || d.isLast || d.isCurrent) ? 1 : 0;
+      })
       .text(d => d.time);
 
-  }, [data, globalWaveMax, hoveredTime, onHover, width, height]);
+  }, [data, globalWaveMax, hoveredTime, onHover, isMobile, width, height]);
 
   return <svg ref={svgRef} width={width} height={height + 5} />;
 };
 
-const TideChart = ({ data, globalTideExtent, hoveredTime, onHover, width = 156, height = 50 }) => {
+const TideChart = ({ data, globalTideExtent, hoveredTime, onHover, theme, isMobile, width = 156, height = 50 }) => {
   const svgRef = useRef(null);
 
   useEffect(() => {
@@ -190,15 +228,20 @@ const TideChart = ({ data, globalTideExtent, hoveredTime, onHover, width = 156, 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
-    // Get current hour
+    // Get current hour to find closest data point
     const currentHour = new Date().getHours();
     let currentIndex = -1;
+    let minDiff = Infinity;
+    
     data.forEach((d, i) => {
       const hour = parseInt(d.timestamp.replace(/[^0-9]/g, ''));
-      if (hour <= currentHour + 12 || currentIndex === -1) {
+      const diff = Math.abs(hour - currentHour);
+      if (diff < minDiff) {
+        minDiff = diff;
         currentIndex = i;
       }
     });
+    
     if (currentIndex === -1) currentIndex = 0;
 
     const margin = { top: 10, right: 5, bottom: 5, left: 5 };
@@ -267,11 +310,13 @@ const TideChart = ({ data, globalTideExtent, hoveredTime, onHover, width = 156, 
       .attr('cy', d => yScale(d.height))
       .attr('r', d => {
         if (hoveredTime && d.time === hoveredTime) return 3;
+        if (hoveredTime) return 1; // Keep small when hovering other points
         return d.isCurrent ? 3 : 1;
       })
       .attr('fill', d => {
-        if (hoveredTime && d.time === hoveredTime) return '#000';
-        return d.isCurrent ? '#000' : '#9ca3af';
+        if (hoveredTime && d.time === hoveredTime) return theme === 'dark' ? '#f5f5f7' : '#000';
+        if (hoveredTime) return '#9ca3af'; // Keep neutral when hovering other points
+        return d.isCurrent ? (theme === 'dark' ? '#f5f5f7' : '#000') : '#9ca3af';
       })
       .style('pointer-events', 'none');
 
@@ -285,10 +330,15 @@ const TideChart = ({ data, globalTideExtent, hoveredTime, onHover, width = 156, 
       .attr('text-anchor', 'middle')
       .style('font-size', '8px')
       .style('font-family', '-apple-system, BlinkMacSystemFont, sans-serif')
-      .style('fill', '#1d1d1f')
-      .style('font-weight', d => d.isCurrent ? '600' : '400')
+      .style('fill', theme === 'dark' ? '#f5f5f7' : '#1d1d1f')
+      .style('font-weight', d => {
+        if (hoveredTime && d.time === hoveredTime) return '600';
+        if (hoveredTime) return '400'; // Keep consistent weight when hovering
+        return d.isCurrent ? '600' : '400';
+      })
       .style('opacity', d => {
         if (hoveredTime && d.time === hoveredTime) return 1;
+        if (hoveredTime) return 0; // Hide all other labels when hovering
         return (d.isFirst || d.isLast || d.isCurrent) ? 1 : 0;
       })
       .style('pointer-events', 'none')
@@ -305,6 +355,19 @@ const SurfForecast = () => {
   const [error, setError] = useState(null);
   const [hoveredTime, setHoveredTime] = useState(null);
   const [theme, setTheme] = useState('light');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     document.body.classList.remove('light', 'dark');
@@ -365,8 +428,25 @@ const SurfForecast = () => {
   // Get tide direction
   const getTideDirection = (spotData) => {
     if (spotData.length < 2) return '';
-    const currentTide = parseFloat(spotData[0].tides_height.replace(' FT', ''));
-    const previousTide = parseFloat(spotData[1].tides_height.replace(' FT', ''));
+    // Find the index closest to current time
+    const currentHour = new Date().getHours();
+    let currentIndex = 0;
+    let minDiff = Infinity;
+    
+    spotData.forEach((d, i) => {
+      const hour = parseInt(d.timestamp.replace(/[^0-9]/g, ''));
+      const diff = Math.abs(hour - currentHour);
+      if (diff < minDiff) {
+        minDiff = diff;
+        currentIndex = i;
+      }
+    });
+    
+    // If we can't find a next data point, return empty
+    if (currentIndex === 0) return '';
+    
+    const currentTide = parseFloat(spotData[currentIndex].tides_height.replace(' FT', ''));
+    const previousTide = parseFloat(spotData[currentIndex - 1].tides_height.replace(' FT', ''));
     return currentTide > previousTide ? '↑' : currentTide < previousTide ? '↓' : '→';
   };
 
@@ -381,7 +461,7 @@ const SurfForecast = () => {
   return (
     <div className={`${styles.container} ${theme === 'light' ? styles.light : styles.dark}`}>
     {/* Theme toggle button */}
-    <button className="themeToggle" onClick={toggleTheme} aria-label="Toggle theme">
+    <button className={styles.themeToggle} onClick={toggleTheme} aria-label="Toggle theme">
         {theme === 'light' ? <Sun size={18} /> : <Moon size={18} />}
       </button>
 
@@ -398,7 +478,7 @@ const SurfForecast = () => {
             <tr>
               <th>Spot</th>
               <th>Rating</th>
-              <th>Wave</th>
+              <th className={styles.chartHeader}>Wave</th>
               <th>Tide</th>
               <th>Wind</th>
               <th>Temp</th>
@@ -409,11 +489,34 @@ const SurfForecast = () => {
           <tbody>
             {spots.map(spot => {
               const spotData = groupedBySpot[spot];
-              const latestData = spotData[0];
+              
+              // Find the data point closest to current time
+              const currentHour = new Date().getHours();
+              let latestDataIndex = 0;
+              let minDiff = Infinity;
+              
+              spotData.forEach((d, i) => {
+                const hour = parseInt(d.timestamp.replace(/[^0-9]/g, ''));
+                const diff = Math.abs(hour - currentHour);
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  latestDataIndex = i;
+                }
+              });
+              
+              const latestData = spotData[latestDataIndex];
               const tideDirection = getTideDirection(spotData);
               const ratingKey = normalizeRatingKey(latestData.rating_rating_key);
               const ratingLabel = ratingToLabel(ratingKey);
               const ratingColor = ratingToColor(ratingKey);
+              
+              // Parse and round temperature
+              const temp = parseFloat(latestData.weather_temperature?.replace(' F', ''));
+              const formattedTemp = !isNaN(temp) ? `${temp.toFixed(1)}°` : latestData.weather_temperature;
+              
+              // Parse and round tide
+              const tideValue = parseFloat(latestData.tides_height.replace(' FT', ''));
+              const formattedTide = `${tideValue.toFixed(1)}ft`;
               
               return (
                 <tr key={spot}>
@@ -433,16 +536,19 @@ const SurfForecast = () => {
                   </td>
                   <td className={styles.data}>{latestData.wave_surf}</td>
                   <td className={styles.data}>
-                    {latestData.tides_height.replace(' FT', 'ft')} {tideDirection}
+                    {formattedTide} {tideDirection}
                   </td>
                   <td className={styles.data}>{latestData.wind_directionType}</td>
-                  <td className={styles.data}>{latestData.weather_temperature?.replace(' F', '°')}</td>
+                  <td className={styles.data}>{formattedTemp}</td>
                   <td className={styles.chart}>
                     <WaveHistogram 
                       data={spotData} 
                       globalWaveMax={globalWaveMax}
                       hoveredTime={hoveredTime}
                       onHover={setHoveredTime}
+                      isMobile={isMobile}
+                      width={isMobile ? 100 : 156}
+                      height={isMobile ? 30 : 50}
                     />
                   </td>
                   <td className={styles.chart}>
@@ -451,6 +557,10 @@ const SurfForecast = () => {
                       globalTideExtent={globalTideExtent}
                       hoveredTime={hoveredTime}
                       onHover={setHoveredTime}
+                      theme={theme}
+                      isMobile={isMobile}
+                      width={isMobile ? 90 : 156}
+                      height={isMobile ? 30 : 50}
                     />
                   </td>
                 </tr>

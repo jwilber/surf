@@ -1,5 +1,26 @@
 /* SurfForecast.module.css - Minimal Apple-inspired Design with global theme vars */
 
+/* Global CSS variables for theming */
+body.light {
+  --bg: #ffffff;
+  --text: #1d1d1f;
+  --muted-text: #86868b;
+  --secondary-text: #424245;
+  --border-color: #d2d2d7;
+  --row-border-color: #f5f5f7;
+  --hover-bg: rgba(0, 0, 0, 0.06);
+}
+
+body.dark {
+  --bg: #000000;
+  --text: #f5f5f7;
+  --muted-text: #98989d;
+  --secondary-text: #c9c9cc;
+  --border-color: #38383a;
+  --row-border-color: #1c1c1e;
+  --hover-bg: rgba(255, 255, 255, 0.06);
+}
+
 /* Container uses theme vars */
 .container {
   background-color: var(--bg);
@@ -7,6 +28,13 @@
   margin: 0 auto;
   max-width: 1200px;
   padding: 2rem;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
 }
 
 .header {
@@ -21,10 +49,22 @@
   letter-spacing: -0.02em;
 }
 
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+}
+
 .subtitle {
   font-size: 0.875rem;
   color: var(--muted-text);
   margin: 0.25rem 0 0 0;
+}
+
+@media (max-width: 768px) {
+  .subtitle {
+    font-size: 0.75rem;
+  }
 }
 
 .loading,
@@ -51,15 +91,29 @@
   border-collapse: collapse;
   font-size: 0.875rem;
   min-width: 900px;
+  table-layout: auto;
 }
 
-.table {
-  table-layout: auto;
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.375rem; /* 6px */
+    min-width: 100%;
+  }
 }
 
 .chartHeader {
   width: 160px;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .chartHeader {
+    width: 90px;
+  }
+
+  .chartHeader:first-of-type {
+    width: 100px; /* More width for histogram */
+  }
 }
 
 .table thead {
@@ -74,6 +128,18 @@
   color: var(--muted-text);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
+
+@media (max-width: 768px) {
+  .table th {
+    padding: 0.25rem 0.125rem;
+    font-size: 0.375rem; /* 6px */
+    letter-spacing: 0;
+  }
+}
+
+.table th.chartHeader {
+  text-align: center;
 }
 
 .table th:first-child {
@@ -98,6 +164,12 @@
   vertical-align: middle;
 }
 
+@media (max-width: 768px) {
+  .table td {
+    padding: 0.25rem 0.125rem;
+  }
+}
+
 .table td:first-child {
   padding-left: 0;
 }
@@ -111,8 +183,31 @@
   color: var(--text);
 }
 
+@media (max-width: 768px) {
+  .spot {
+    font-size: 0.375rem; /* 6px */
+  }
+}
+
 .rating {
   white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .rating {
+    text-align: center;
+  }
+}
+
+.ratingBadge {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .ratingBadge {
+    font-size: 0.375rem; /* 6px */
+  }
 }
 
 .ratingDots {
@@ -126,8 +221,22 @@
   font-size: 0.875rem;
 }
 
+@media (max-width: 768px) {
+  .data {
+    font-size: 0.375rem; /* 6px */
+    white-space: nowrap;
+    text-align: center;
+  }
+}
+
 .chart {
   padding: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .chart {
+    padding: 0.25rem 0;
+  }
 }
 
 .chart svg {
@@ -149,6 +258,7 @@
   justify-content: center;
   transition: background-color 0.2s ease;
   z-index: 1000;
+  color: var(--text);
 }
 
 .themeToggle:hover {
